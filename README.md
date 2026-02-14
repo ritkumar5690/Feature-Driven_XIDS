@@ -17,6 +17,52 @@ A production-ready, explainable machine learning system for network intrusion de
 - **🐳 Docker Support**: Easy deployment with Docker Compose
 - **📈 High Accuracy**: ~95% accuracy on CIC-IDS2017 dataset
 
+## 📈 Dashboard Pages (6-Page Enterprise Analytics)
+
+The frontend features a comprehensive 6-page analytics dashboard:
+
+### 1. **Overview Dashboard**
+- Executive-level security monitoring KPIs
+- Real-time metrics: Security Score, Traffic, Threats, Risk Level
+- Detection Rate & False Positive Rate gauges
+- 24-hour trend analysis with interactive charts
+- Color-coded threat distribution
+
+### 2. **Detection Analytics**
+- Model performance evaluation (Accuracy: 94.2%, Precision: 91.85%, Recall: 93.10%)
+- Confusion matrix with normalization
+- ROC curve with AUC calculation
+- Per-class performance breakdown
+- Probability distribution analysis
+
+### 3. **Feature Importance**
+- Top 10 features ranked by importance
+- Feature correlation heatmap
+- Distribution comparison between normal and attack flows
+- Attack-type-specific importance analysis
+- Statistical summaries (Mean, Std, Min, Max)
+
+### 4. **Explainability (SHAP/LIME)** ⭐ Core XAI
+- SHAP Summary Plot (global feature impact)
+- SHAP Force Plot (prediction-level breakdown)
+- Feature Contribution Waterfall chart
+- LIME Local Explanation method
+- Comparison of explanation approaches
+
+### 5. **Data Drift Monitoring**
+- Production data drift detection using KS-test
+- Feature distribution comparison (reference vs. current)
+- Drift timeline with trends and alerts
+- Performance impact correlation
+- Retraining recommendations
+
+### 6. **Risk Assessment**
+- Risk scoring system (0-100 scale)
+- Threat classification and severity levels
+- Risky IP and service detection
+- Attack pattern heatmaps
+- Incident response guidance for each risk level
+
 ## 🏗️ Architecture
 
 ```
@@ -117,26 +163,35 @@ Expected classes:
 
 ## 🚀 Usage
 
-### 1. Train the Model
+### 1. Train the Model (FD-XIDS)
 
-Update the dataset path in `backend/model/train.py`:
+This project ships with an FD-XIDS training script that trains a Random Forest
+baseline, extracts feature importances, and saves the trained model. It
+expects a processed CSV with a `label` column at:
 
-```python
-DATA_PATH = "/path/to/CIC-IDS2017.csv"
-```
+`backend/data/processed/train_processed.csv`
 
-Run training:
+Run training (from project root):
 
 ```bash
-cd backend/model
-python train.py
+python backend/models/train_model.py --data backend/data/processed/train_processed.csv
 ```
 
-This will:
-- Load and preprocess the dataset
-- Train XGBoost and Random Forest models
-- Evaluate and select the best model
-- Save `saved_model.pkl` and `preprocessor.pkl`
+Optional: enable hyperparameter tuning (GridSearch):
+
+```bash
+python backend/models/train_model.py --data backend/data/processed/train_processed.csv --tune
+```
+
+Files produced:
+- Trained model: `backend/models/saved_models/fd_xids_model.pkl`
+- Feature importances: `backend/models/feature_importances.csv`
+
+Notes:
+- The script uses an 80/20 train/test split and expects all categorical
+  features encoded and numeric features scaled in the processed CSV.
+- Default objective is binary classification (Normal=0, Attack=1). You can
+  extend to multi-class by preparing multi-class labels in the `label` column.
 
 ### 2. Start the Backend API
 
@@ -169,6 +224,22 @@ Access:
 - Frontend: http://localhost:8501
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
+
+### 5. Authentication (Demo Account)
+
+The frontend includes a user authentication system:
+
+**Default Demo Credentials:**
+- Email: `demo@xids.local`
+- Password: `demo123`
+
+Or create a new account during first access:
+- Register with email and password
+- Email validation included
+- Password strength requirements (minimum 6 characters)
+- Secure session management
+
+See [AUTHENTICATION.md](AUTHENTICATION.md) for full authentication implementation details.
 
 ## 🔌 API Endpoints
 
@@ -461,5 +532,6 @@ For issues, questions, or contributions:
 **Built with ❤️ for Cybersecurity Research**
 
 *Powered by XGBoost, SHAP, FastAPI, and Streamlit*
-#   F e a t u r e - D r i v e n _ X I D S  
+#   F e a t u r e - D r i v e n _ X I D S 
+ 
  
